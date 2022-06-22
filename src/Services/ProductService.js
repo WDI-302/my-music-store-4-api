@@ -17,6 +17,26 @@ const getProducts = async (req, res, next) => {
 
 };
 
+const addNewProduct = async (req, res, next) =>{
+
+  try {
+    
+    // Get the product data from the
+    const productData = req.body.productData;
+    
+    console.log('productData: ', productData);
+    
+    const newProductDocument = new ProductModel(productData);
+    
+    await newProduct.save();
+    
+    res.send(req.body);
+  } catch (error) {
+   console.log('error') ;
+  }
+}
+
 module.exports = {
   getProducts,
+  addNewProduct,
 };
