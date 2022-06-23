@@ -28,11 +28,11 @@ const addNewProduct = async (req, res, next) =>{
     
     const newProductDocument = new ProductModel(productData);
     
-    await newProduct.save();
+    await newProductDocument.save();
     
-    res.send(req.body);
+    res.send({ product: { ...newProductDocument.toObject(), id: newProductDocument._id }});
   } catch (error) {
-   console.log('error') ;
+   console.log(error) ;
   }
 }
 
