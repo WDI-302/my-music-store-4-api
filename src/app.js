@@ -1,9 +1,12 @@
 require('dotenv').config()
 const express = require('express');
+var cookieParser = require('cookie-parser');
 const productRouter = require('./routes/productRouter');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const userRouter = require('./routes/userRouter');
+const AuthorizationService = require('./Services/AuthorizationService');
 
 const app = express();
 const port = 3017;
@@ -16,10 +19,7 @@ mongoose
 mongoose.set('debug', true);
 
 // Parsing cookies
-app.use((req, res, next) => {
-  console.log('parsing all of your cookies from their native format to a developer friendly format so that we can work on it on express');
-  next();
-});
+app.use(cookieParser());
 
 // CORS POLICY
 app.use(cors());
@@ -28,11 +28,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Authorization
-app.use((req, res, next) => {
-  console.log('userAuthization middleware');
-  next();
-});
+app.use(AuthorizationService.checkAuth);
 
+app.use(userRouter);
 app.use(productRouter);
 
 

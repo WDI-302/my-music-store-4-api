@@ -18,8 +18,11 @@ const getProducts = async (req, res, next) => {
 };
 
 const addNewProduct = async (req, res, next) =>{
-
   try {
+    console.log('req.user:', req.user)
+    if(!req.user){
+      return res.json({error: 'user not logged in'})
+    }
     
     // Get the product data from the
     const productData = req.body.productData;
