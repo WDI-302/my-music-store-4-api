@@ -16,4 +16,9 @@ userRouter.post('/register', async (req, res, next) => {
   return UserService.register(req, res, next);
 });
 
+userRouter.get('/sign-out', async (req, res, next) => {
+
+  return UserService.singOut(req, res, next);
+});
+
 module.exports = userRouter;

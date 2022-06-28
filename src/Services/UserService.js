@@ -6,21 +6,34 @@ const UserModel = require("../Models/UserModel");
 
 // Register / Create user accounts
   // get credentials and user info from client
-  // Bcrypt the password
+  // Bcrypt the password before saving in the database
   // save the user information in the database
-  // log in the user
-  
 
 // Sign -in / Authentication
   // get credentials from client
   // verify they match what is in the database (use bcrypt again to verify)
   
-  // AUTHORIZATION:
-    // granting the client a JWT (json web token) that they can keep
-      // so they dont have to give us the password each time
+  // - AUTHORIZATION:
+    // granting the client a JWT (json web token)
+    // Store in the cookies so that it stays attached to every future web request to the server.
+        // use the cookie-parser library to set the cookies
+        // Make cors compatible with your credential cookies.
 
+// - Set the correct cors policy for the front end to be compatible with the server:
+        // app.use(cors({
+        //   credentials: true,
+        //   origin: 'http://yourDomain'
+        // }));
+ 
+// - Make sure to set up your front axios correctly and have the option {withCredentials: true } in order for axios to work with the cookies
 
-// on every request we need to check for a JWT to see if a user is signed in, and if they are, who they are.
+// on every request we need to check for a JWT to see if a user is signed in, by checking for a jwt in the cookies.
+  // Set up an authorization middleware that checks for the token in the cookies
+  // If the JWT in the cookies is valid then you can add the user to your req or res objects and now that links every request to a user if they're signed in
+
+  // Make sure our cookies are HTTP only. That makes them not accessible to scripts.
+    //       res.cookie('session_token', token, { httpOnly: true, secure: false});
+
 
 const cleanUser = (userDocument) => {
   return {
@@ -74,8 +87,9 @@ const register = async (req, res, next) => {
 
      // after we save we authorize the user
      const token = getToken(userDocument._id);
+     res.cookie('session_token', token);
 
-     res.send({ token, user: cleanUser(userDocument) });
+     res.send({ user: cleanUser(userDocument) });
 
 
   } catch (error){
@@ -83,9 +97,18 @@ const register = async (req, res, next) => {
   }
 };
 
+const singOut = (req, res, next) => {
+  try{
+    res.clearCookie('session_token').send('Signed out');
+  } catch(error){
+    console.log('error: ', error);
+  }
+};
+
 
 
 const signIn = async (req, res, next) => {
+  console.log('sign in: ');
   try {
     const {
       email,
@@ -93,15 +116,14 @@ const signIn = async (req, res, next) => {
       } = req.body.credentials;    
       
       const foundUser = await UserModel.findOne({ email: email });
-
-      console.log('user: ', foundUser);
-
+      console.log('foundUser')
+      
       if(!foundUser){
         return res.status(401).json({error: "user not found or incorrect credentials"});
       }
-
+      
       // if user has been found now lets check that the password matches.
-
+      
       const passwordMatch = await bcrypt.compare(password, foundUser.passwordHash);
 
       // if the password is incorrect throw an error
@@ -110,7 +132,9 @@ const signIn = async (req, res, next) => {
       }
 
       const token = getToken(foundUser._id);
-      res.cookie('session_token', token);
+      
+      // secure should be false for HTTP and true for HTTPS
+      res.cookie('session_token', token, { httpOnly: true, secure: false });
      res.send({ user: cleanUser(foundUser) });
 
 
@@ -121,6 +145,6 @@ const signIn = async (req, res, next) => {
 };
 
 
-const UserService = { signIn, register };
+const UserService = { signIn, register, singOut };
 
 module.exports = UserService;

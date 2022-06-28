@@ -22,7 +22,11 @@ mongoose.set('debug', true);
 app.use(cookieParser());
 
 // CORS POLICY
-app.use(cors());
+// allows every domain to access this server by default
+app.use(cors({
+  credentials: true,
+  origin: 'http://localhost:3000'
+}));
 
 // Parsing JSON
 app.use(bodyParser.json());
