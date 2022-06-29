@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
+const logger = require('../logger');
 
 const UserModel = require("../Models/UserModel");
 
@@ -72,8 +73,6 @@ const register = async (req, res, next) => {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      console.log('hashedPassword: ', hashedPassword);
-      
      // Save user info in database
      const userDocument = new UserModel({
       firstName,
@@ -102,6 +101,7 @@ const singOut = (req, res, next) => {
     res.clearCookie('session_token').send('Signed out');
   } catch(error){
     console.log('error: ', error);
+    logger.error(error)
   }
 };
 

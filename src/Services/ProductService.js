@@ -1,4 +1,5 @@
 const ProductModel = require("../Models/ProductModel");
+const { verifyAdminPermission } = require("./PermissionService");
 
 const getProducts = async (req, res, next) => {
   // All of the logic on how to get the products
@@ -19,15 +20,11 @@ const getProducts = async (req, res, next) => {
 
 const addNewProduct = async (req, res, next) =>{
   try {
-    console.log('req.user:', req.user)
-    if(!req.user){
-      return res.json({error: 'user not logged in'})
-    }
+    verifyAdminPermission(req);
     
     // Get the product data from the
     const productData = req.body.productData;
     
-    console.log('productData: ', productData);
     
     const newProductDocument = new ProductModel(productData);
     

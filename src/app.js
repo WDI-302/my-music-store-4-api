@@ -7,6 +7,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/userRouter');
 const AuthorizationService = require('./Services/AuthorizationService');
+const logger = require('./logger');
 
 const app = express();
 const port = 3017;
@@ -36,6 +37,12 @@ app.use(AuthorizationService.checkAuth);
 
 app.use(userRouter);
 app.use(productRouter);
+
+logger.log({
+  level: 'info',
+  message: 'Hello distributed log files!'
+});
+
 
 
 
